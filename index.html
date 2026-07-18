@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src https://api.open-meteo.com">
 <title>Holy Muscle — HP</title>
-<meta name="description" content="意味のわからない作品を収蔵する、白い美術館。空はいつも秋田の空。">
+<meta name="description" content="つくったものを置いていく場所。空はいつも秋田の空。">
 <style>
   :root {
     --ink: #1c1c1c;
@@ -299,20 +299,16 @@
   <div class="wrap">
 
     <header class="hero">
-      <p class="kicker">Museum of Meaningless Works</p>
       <h1 class="serif">Holy Muscle</h1>
       <p class="hp">— HP（ホームページ / ヒットポイント）</p>
       <p class="lead">
-        意味のわからない作品を収蔵する、白い美術館。<br>
-        意味がわかるものは、だいたい他の人が作ってる。だから意味がわからないものを、
-        思いついたら"やると決めて"つくっています。<br>
-        <span style="font-size: 0.85rem; color: var(--faint);">なお、この美術館の空は、いま本物の秋田の空と連動しています。</span>
+        <span style="font-size: 0.85rem; color: var(--faint);">この背景は、いま本物の秋田の空と連動しています。</span>
       </p>
     </header>
 
     <section>
       <h2 class="section">Collection</h2>
-      <p class="section-sub">常設展示 — クリックで作品の中に入れます</p>
+      <p class="section-sub">クリックで遊べます</p>
       <div class="grid">
 
         <a href="https://halo-breath.vercel.app/" target="_blank" rel="noopener" class="card">
@@ -321,7 +317,7 @@
             <h3>halo-breath</h3>
             <p>呼吸を整える光の画面。吸う4秒 / 吐く6秒。通信ゼロ・外部素材ゼロで、ただただ光る。</p>
           </div>
-          <div class="go">入館する →</div>
+          <div class="go">遊ぶ / 呼吸する →</div>
         </a>
 
         <a href="https://meigen-kohl.vercel.app/" target="_blank" rel="noopener" class="card">
@@ -358,7 +354,7 @@
 
     <section>
       <h2 class="section">Archive</h2>
-      <p class="section-sub">収蔵庫 — 作ったものは全部ここに記録される（面白さは保証しない）</p>
+      <p class="section-sub">作ったものは全部ここに記録される</p>
       <ul class="archive">
         <li><span>GRAVITY QUEST（物理パズル）</span><span class="st">公開準備中</span></li>
         <li><span>kuso_asmr</span><span class="st">仕込み中</span></li>
@@ -370,33 +366,21 @@
     </section>
 
     <section>
-      <h2 class="section">Curator</h2>
-      <p class="section-sub">館長あいさつ</p>
+      <h2 class="section">Horikuma</h2>
       <div class="curator">
         <canvas id="mascot" width="14" height="13"></canvas>
         <div class="bio">
-          <b>ほりくま館長</b>（クマ / 秋田出身）<br>
-          この美術館の管理をまかされているクマ。作品の意味を聞かれても「意味はない」としか答えない。
+          <b>ほりくま</b>（クマ / 秋田出身）<br>
+          このHPの管理をまかされているクマ。アプリの意味を聞かれても「意味はない」としか答えない。
           なでると少しよろこぶ。
           <p class="pet" id="petCount">なでられた回数：0</p>
         </div>
       </div>
     </section>
 
-    <section>
-      <h2 class="section">Voice</h2>
-      <p class="section-sub">ご意見箱</p>
-      <div class="voice">
-        作品への感想・苦情・意味の問い合わせは
-        <a href="https://github.com/gyaruweijing-tech/file-is-beautiful/issues/new" target="_blank" rel="noopener">ご意見箱（GitHub Issues）</a>
-        へ。館長が読みます（返事はクマなのでできません）。
-      </div>
-    </section>
-
     <footer>
       <div class="counter" id="visitCounter">000000</div>
-      <p>あなたはこの美術館に <span id="visitTimes">?</span> 回目のご来館です（あなた調べ）</p>
-      <p style="margin-top: 20px;">"やりたい" ではなく "やると決めた" ので建てました。</p>
+      <p>あなたは <span id="visitTimes">?</span> 回目の訪問です（あなた調べ）</p>
     </footer>
 
   </div>
