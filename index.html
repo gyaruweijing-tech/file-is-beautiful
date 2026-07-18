@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ゆずっち Lab</title>
+<meta name="description" content="意味がわからないものを、やると決めてつくる実験場。">
+<style>
+  :root {
+    --bg: #0a0b0f;
+    --text: #d7dbe4;
+    --muted: #8b93a5;
+    --faint: #565e70;
+    --white: #ffffff;
+    --card-border: rgba(255, 255, 255, 0.08);
+    --indigo: #8f9dff;
+    --amber: #ffd07a;
+    --sky: #7ac8ff;
+    --fuchsia: #f096ff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    background-image: radial-gradient(700px circle at 20% -5%, rgba(120, 140, 255, 0.16), transparent 60%);
+    background-repeat: no-repeat;
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 72px 24px;
+  }
+  .tag {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  header { margin-bottom: 72px; }
+  header .tag { color: var(--indigo); margin-bottom: 12px; }
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+  .lead {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 40em;
+  }
+  h2.section {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  section { margin-bottom: 72px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 640px) {
+    .grid { grid-template-columns: 1fr; }
+    .wrap { padding: 48px 20px; }
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 18px;
+    padding: 24px;
+    background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border: 1px solid var(--card-border);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  a.card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--white);
+  }
+  .pill {
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .pill.indigo  { background: rgba(120, 140, 255, 0.12); color: var(--indigo); }
+  .pill.amber   { background: rgba(255, 190, 90, 0.12);  color: var(--amber); }
+  .pill.sky     { background: rgba(90, 180, 255, 0.12);  color: var(--sky); }
+  .pill.fuchsia { background: rgba(230, 120, 255, 0.12); color: var(--fuchsia); }
+  .card p {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .card .note {
+    display: block;
+    margin-top: 6px;
+    font-style: italic;
+    color: var(--faint);
+  }
+  .card .go {
+    margin-top: 20px;
+    font-size: 0.9rem;
+  }
+  .go.indigo { color: var(--indigo); }
+  .go.amber  { color: var(--amber); }
+  .go.sky    { color: var(--sky); }
+  .card.soon {
+    opacity: 0.75;
+    border-style: dashed;
+  }
+  .card.soon .go { color: var(--faint); }
+  .next-note {
+    font-size: 0.9rem;
+    color: var(--faint);
+  }
+  footer {
+    padding-top: 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 12px;
+    color: var(--faint);
+  }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+
+    <!-- Hero -->
+    <header>
+      <p class="tag">Portfolio</p>
+      <h1>ゆずっち Lab</h1>
+      <p class="lead">
+        意味がわかるものは、だいたい他の人が作ってる。<br>
+        だから意味がわからないものを、思いついたら"やると決めて"つくってます。
+      </p>
+    </header>
+
+    <!-- Live apps -->
+    <section>
+      <h2 class="section">Live</h2>
+      <div class="grid">
+
+        <a href="https://halo-breath.vercel.app/" target="_blank" rel="noopener" class="card">
+          <div>
+            <div class="card-head">
+              <h3>halo-breath</h3>
+              <span class="pill indigo">呼吸</span>
+            </div>
+            <p>呼吸を整える光の画面。吸う4秒 / 吐く6秒。通信ゼロ・外部素材ゼロで、ただただ光る。</p>
+          </div>
+          <div class="go indigo">遊ぶ / 呼吸する →</div>
+        </a>
+
+        <a href="https://meigen-kohl.vercel.app/" target="_blank" rel="noopener" class="card">
+          <div>
+            <div class="card-head">
+              <h3>名言シャッフル</h3>
+              <span class="pill amber">ことば</span>
+            </div>
+            <p>心に響く名言をランダムに表示するシンプルなアプリ。
+              <span class="note">※ 本人談「もう少し面白くしなあかんな」— 改修候補</span>
+            </p>
+          </div>
+          <div class="go amber">名言を浴びる →</div>
+        </a>
+
+        <a href="https://spacex-stock.vercel.app/" target="_blank" rel="noopener" class="card">
+          <div>
+            <div class="card-head">
+              <h3>SPCX</h3>
+              <span class="pill sky">株価</span>
+            </div>
+            <p>SpaceX関連ティッカーの価格を、でかい数字でただ表示するだけの一枚モノ。それでいい。</p>
+          </div>
+          <div class="go sky">株価を見る →</div>
+        </a>
+
+        <div class="card soon">
+          <div>
+            <div class="card-head">
+              <h3>難しい言葉しりとり</h3>
+              <span class="pill fuchsia">開発中</span>
+            </div>
+            <p>AIが誰も聞いたことなさそうな難しい単語ばかり返してくる、説明付きしりとり。単語DBを夜な夜な育成予定。</p>
+          </div>
+          <div class="go">Coming soon…</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Next batch -->
+    <section>
+      <h2 class="section">仕込み中</h2>
+      <p class="next-note">
+        まだ公開されていない実験がいくつか眠っています。デプロイでき次第、面白いものだけここに追加。
+      </p>
+    </section>
+
+    <footer>
+      "やりたい" ではなく "やると決めた" ので作りました。
+    </footer>
+
+  </div>
+
+</body>
+</html>
