@@ -3,229 +3,529 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ゆずっち Lab</title>
-<meta name="description" content="意味がわからないものを、やると決めてつくる実験場。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src https://api.open-meteo.com">
+<title>Holy Muscle — HP</title>
+<meta name="description" content="意味のわからない作品を収蔵する、白い美術館。空はいつも秋田の空。">
 <style>
   :root {
-    --bg: #0a0b0f;
-    --text: #d7dbe4;
-    --muted: #8b93a5;
-    --faint: #565e70;
-    --white: #ffffff;
-    --card-border: rgba(255, 255, 255, 0.08);
-    --indigo: #8f9dff;
-    --amber: #ffd07a;
-    --sky: #7ac8ff;
-    --fuchsia: #f096ff;
+    --ink: #1c1c1c;
+    --sub: #6b6b6b;
+    --faint: #9a9a9a;
+    --line: #e4e2dd;
+    --paper: #fdfcfa;
+    --accent: #b0532f;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   body {
-    background: var(--bg);
-    background-image: radial-gradient(700px circle at 20% -5%, rgba(120, 140, 255, 0.16), transparent 60%);
-    background-repeat: no-repeat;
-    color: var(--text);
+    background: var(--paper);
+    color: var(--ink);
     font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Segoe UI", system-ui, sans-serif;
-    line-height: 1.7;
+    line-height: 1.9;
     min-height: 100vh;
+    transition: background 2s ease;
   }
+  .serif { font-family: "Hiragino Mincho ProN", "Yu Mincho", serif; }
+
+  /* ===== 空（秋田の天気で変わる背景レイヤー） ===== */
+  #sky {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    transition: background 2s ease;
+  }
+  body[data-wx="sunny"]  #sky { background: linear-gradient(180deg, #fff8ec 0%, var(--paper) 45%); }
+  body[data-wx="cloudy"] #sky { background: linear-gradient(180deg, #eef0f2 0%, var(--paper) 55%); }
+  body[data-wx="rain"]   #sky { background: linear-gradient(180deg, #e6eaee 0%, var(--paper) 60%); }
+  body[data-wx="storm"]  #sky { background: linear-gradient(180deg, #d8dce2 0%, var(--paper) 70%); }
+  body[data-wx="snow"]   #sky { background: linear-gradient(180deg, #f2f4f7 0%, var(--paper) 55%); }
+  body[data-wx="sunny"] #sky::before {
+    content: "";
+    position: absolute;
+    top: -80px; right: 10%;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 205, 110, 0.35), transparent 70%);
+  }
+  body[data-wx="cloudy"] #sky::before,
+  body[data-wx="rain"] #sky::before,
+  body[data-wx="storm"] #sky::before {
+    content: "";
+    position: absolute;
+    top: 40px; left: -100px;
+    width: 480px; height: 110px;
+    border-radius: 999px;
+    background: rgba(190, 196, 204, 0.35);
+    filter: blur(30px);
+    animation: drift 60s linear infinite;
+  }
+  @keyframes drift {
+    from { transform: translateX(-200px); }
+    to   { transform: translateX(110vw); }
+  }
+  .drop {
+    position: absolute;
+    top: -30px;
+    width: 1px;
+    height: 22px;
+    background: rgba(120, 140, 160, 0.35);
+    animation: fall linear infinite;
+  }
+  .flake {
+    position: absolute;
+    top: -20px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(160, 170, 185, 0.5);
+    animation: fall linear infinite;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh); }
+  }
+  #flash {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+  }
+  body[data-wx="storm"] #flash { animation: lightning 9s ease-in-out infinite; }
+  @keyframes lightning {
+    0%, 91%, 95%, 100% { opacity: 0; }
+    92%, 94% { opacity: 0.5; }
+  }
+
+  /* ===== レイアウト ===== */
   .wrap {
-    max-width: 960px;
+    max-width: 860px;
     margin: 0 auto;
-    padding: 72px 24px;
+    padding: 80px 24px;
   }
-  .tag {
+  .wx-note {
+    position: fixed;
+    top: 16px; right: 20px;
     font-size: 11px;
+    color: var(--faint);
     letter-spacing: 0.08em;
+    background: rgba(253, 252, 250, 0.8);
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+  }
+  header.hero { margin-bottom: 90px; }
+  .hero .kicker {
+    font-size: 11px;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 18px;
   }
-  header { margin-bottom: 72px; }
-  header .tag { color: var(--indigo); margin-bottom: 12px; }
   h1 {
-    font-size: clamp(2.2rem, 6vw, 3.2rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--white);
-    margin-bottom: 16px;
+    font-size: clamp(2.4rem, 7vw, 3.6rem);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    margin-bottom: 6px;
   }
-  .lead {
-    font-size: 1.05rem;
-    color: var(--muted);
-    max-width: 40em;
+  .hero .hp {
+    font-size: 0.95rem;
+    color: var(--sub);
+    margin-bottom: 28px;
+  }
+  .hero .lead {
+    color: var(--sub);
+    max-width: 36em;
   }
   h2.section {
     font-size: 12px;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.25em;
     text-transform: uppercase;
     color: var(--faint);
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 8px;
   }
-  section { margin-bottom: 72px; }
+  .section-sub {
+    font-size: 0.85rem;
+    color: var(--faint);
+    margin-bottom: 28px;
+  }
+  section { margin-bottom: 90px; }
+
+  /* ===== 作品カード ===== */
   .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
   }
   @media (max-width: 640px) {
     .grid { grid-template-columns: 1fr; }
-    .wrap { padding: 48px 20px; }
+    .wrap { padding: 64px 20px; }
   }
   .card {
+    background: var(--paper);
+    padding: 30px 28px;
+    text-decoration: none;
+    color: inherit;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border-radius: 18px;
-    padding: 24px;
-    background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-    border: 1px solid var(--card-border);
-    text-decoration: none;
-    color: inherit;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height: 190px;
+    transition: background 0.25s ease;
   }
-  a.card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
-  }
-  .card-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
+  a.card:hover { background: #f6f4ef; }
+  .card .no {
+    font-size: 11px;
+    color: var(--faint);
+    letter-spacing: 0.15em;
     margin-bottom: 10px;
   }
   .card h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--white);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 8px;
   }
-  .pill {
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    padding: 3px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-  .pill.indigo  { background: rgba(120, 140, 255, 0.12); color: var(--indigo); }
-  .pill.amber   { background: rgba(255, 190, 90, 0.12);  color: var(--amber); }
-  .pill.sky     { background: rgba(90, 180, 255, 0.12);  color: var(--sky); }
-  .pill.fuchsia { background: rgba(230, 120, 255, 0.12); color: var(--fuchsia); }
   .card p {
-    font-size: 0.9rem;
-    color: var(--muted);
+    font-size: 0.85rem;
+    color: var(--sub);
   }
   .card .note {
     display: block;
-    margin-top: 6px;
-    font-style: italic;
+    margin-top: 4px;
     color: var(--faint);
+    font-style: italic;
   }
   .card .go {
-    margin-top: 20px;
-    font-size: 0.9rem;
+    margin-top: 18px;
+    font-size: 0.85rem;
+    color: var(--accent);
   }
-  .go.indigo { color: var(--indigo); }
-  .go.amber  { color: var(--amber); }
-  .go.sky    { color: var(--sky); }
-  .card.soon {
-    opacity: 0.75;
-    border-style: dashed;
-  }
+  .card.soon { opacity: 0.65; }
   .card.soon .go { color: var(--faint); }
-  .next-note {
+
+  /* ===== アーカイブ ===== */
+  .archive { border-top: 1px solid var(--line); }
+  .archive li {
+    list-style: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 4px;
+    border-bottom: 1px solid var(--line);
     font-size: 0.9rem;
-    color: var(--faint);
   }
+  .archive .st {
+    font-size: 11px;
+    color: var(--faint);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  /* ===== 館長 ===== */
+  .curator {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    border: 1px solid var(--line);
+    padding: 28px;
+    flex-wrap: wrap;
+  }
+  #mascot {
+    image-rendering: pixelated;
+    cursor: pointer;
+    animation: bob 2.4s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  .curator .bio { flex: 1; min-width: 220px; font-size: 0.9rem; color: var(--sub); }
+  .curator .bio b { color: var(--ink); }
+  .pet {
+    font-size: 0.8rem;
+    color: var(--faint);
+    margin-top: 8px;
+  }
+  .heart {
+    position: fixed;
+    font-size: 14px;
+    pointer-events: none;
+    animation: floatup 1s ease-out forwards;
+    z-index: 10;
+  }
+  @keyframes floatup {
+    to { transform: translateY(-60px); opacity: 0; }
+  }
+
+  /* ===== ご意見箱・カウンター ===== */
+  .voice {
+    border: 1px solid var(--line);
+    padding: 28px;
+    font-size: 0.9rem;
+    color: var(--sub);
+  }
+  .voice a { color: var(--accent); }
   footer {
-    padding-top: 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    font-size: 12px;
-    color: var(--faint);
+    border-top: 1px solid var(--line);
+    padding-top: 36px;
+    text-align: center;
   }
+  .counter {
+    display: inline-block;
+    background: #101410;
+    color: #7dff9a;
+    font-family: "Consolas", monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.35em;
+    padding: 8px 14px 8px 20px;
+    border-radius: 4px;
+    border: 2px solid #2a2f2a;
+    margin-bottom: 10px;
+  }
+  footer p { font-size: 11px; color: var(--faint); }
 </style>
 </head>
-<body>
+<body data-wx="sunny">
+
+  <div id="sky"></div>
+  <div id="flash"></div>
+  <div id="particles"></div>
+  <div class="wx-note" id="wxNote">秋田の空：確認中…</div>
 
   <div class="wrap">
 
-    <!-- Hero -->
-    <header>
-      <p class="tag">Portfolio</p>
-      <h1>ゆずっち Lab</h1>
+    <header class="hero">
+      <p class="kicker">Museum of Meaningless Works</p>
+      <h1 class="serif">Holy Muscle</h1>
+      <p class="hp">— HP（ホームページ / ヒットポイント）</p>
       <p class="lead">
-        意味がわかるものは、だいたい他の人が作ってる。<br>
-        だから意味がわからないものを、思いついたら"やると決めて"つくってます。
+        意味のわからない作品を収蔵する、白い美術館。<br>
+        意味がわかるものは、だいたい他の人が作ってる。だから意味がわからないものを、
+        思いついたら"やると決めて"つくっています。<br>
+        <span style="font-size: 0.85rem; color: var(--faint);">なお、この美術館の空は、いま本物の秋田の空と連動しています。</span>
       </p>
     </header>
 
-    <!-- Live apps -->
     <section>
-      <h2 class="section">Live</h2>
+      <h2 class="section">Collection</h2>
+      <p class="section-sub">常設展示 — クリックで作品の中に入れます</p>
       <div class="grid">
 
         <a href="https://halo-breath.vercel.app/" target="_blank" rel="noopener" class="card">
           <div>
-            <div class="card-head">
-              <h3>halo-breath</h3>
-              <span class="pill indigo">呼吸</span>
-            </div>
+            <p class="no">No. 001</p>
+            <h3>halo-breath</h3>
             <p>呼吸を整える光の画面。吸う4秒 / 吐く6秒。通信ゼロ・外部素材ゼロで、ただただ光る。</p>
           </div>
-          <div class="go indigo">遊ぶ / 呼吸する →</div>
+          <div class="go">入館する →</div>
         </a>
 
         <a href="https://meigen-kohl.vercel.app/" target="_blank" rel="noopener" class="card">
           <div>
-            <div class="card-head">
-              <h3>名言シャッフル</h3>
-              <span class="pill amber">ことば</span>
-            </div>
-            <p>心に響く名言をランダムに表示するシンプルなアプリ。
-              <span class="note">※ 本人談「もう少し面白くしなあかんな」— 改修候補</span>
+            <p class="no">No. 002</p>
+            <h3>名言シャッフル</h3>
+            <p>心に響く名言をランダムに表示する。
+              <span class="note">※ 作者談「もう少し面白くしなあかんな」— 改修予定</span>
             </p>
           </div>
-          <div class="go amber">名言を浴びる →</div>
+          <div class="go">名言を浴びる →</div>
         </a>
 
         <a href="https://spacex-stock.vercel.app/" target="_blank" rel="noopener" class="card">
           <div>
-            <div class="card-head">
-              <h3>SPCX</h3>
-              <span class="pill sky">株価</span>
-            </div>
+            <p class="no">No. 003</p>
+            <h3>SPCX</h3>
             <p>SpaceX関連ティッカーの価格を、でかい数字でただ表示するだけの一枚モノ。それでいい。</p>
           </div>
-          <div class="go sky">株価を見る →</div>
+          <div class="go">株価を見る →</div>
         </a>
 
         <div class="card soon">
           <div>
-            <div class="card-head">
-              <h3>難しい言葉しりとり</h3>
-              <span class="pill fuchsia">開発中</span>
-            </div>
+            <p class="no">No. 004</p>
+            <h3>難しい言葉しりとり</h3>
             <p>AIが誰も聞いたことなさそうな難しい単語ばかり返してくる、説明付きしりとり。単語DBを夜な夜な育成予定。</p>
           </div>
-          <div class="go">Coming soon…</div>
+          <div class="go">制作中 — Coming soon</div>
         </div>
 
       </div>
     </section>
 
-    <!-- Next batch -->
     <section>
-      <h2 class="section">仕込み中</h2>
-      <p class="next-note">
-        まだ公開されていない実験がいくつか眠っています。デプロイでき次第、面白いものだけここに追加。
-      </p>
+      <h2 class="section">Archive</h2>
+      <p class="section-sub">収蔵庫 — 作ったものは全部ここに記録される（面白さは保証しない）</p>
+      <ul class="archive">
+        <li><span>GRAVITY QUEST（物理パズル）</span><span class="st">公開準備中</span></li>
+        <li><span>kuso_asmr</span><span class="st">仕込み中</span></li>
+        <li><span>arigatami-app</span><span class="st">仕込み中</span></li>
+        <li><span>yokeru-corp</span><span class="st">仕込み中</span></li>
+        <li><span>ronbun-hogusu（論文ほぐし）</span><span class="st">設計中</span></li>
+        <li><span>catch-game</span><span class="st">URL行方不明</span></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2 class="section">Curator</h2>
+      <p class="section-sub">館長あいさつ</p>
+      <div class="curator">
+        <canvas id="mascot" width="14" height="13"></canvas>
+        <div class="bio">
+          <b>ほりくま館長</b>（クマ / 秋田出身）<br>
+          この美術館の管理をまかされているクマ。作品の意味を聞かれても「意味はない」としか答えない。
+          なでると少しよろこぶ。
+          <p class="pet" id="petCount">なでられた回数：0</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section">Voice</h2>
+      <p class="section-sub">ご意見箱</p>
+      <div class="voice">
+        作品への感想・苦情・意味の問い合わせは
+        <a href="https://github.com/gyaruweijing-tech/file-is-beautiful/issues/new" target="_blank" rel="noopener">ご意見箱（GitHub Issues）</a>
+        へ。館長が読みます（返事はクマなのでできません）。
+      </div>
     </section>
 
     <footer>
-      "やりたい" ではなく "やると決めた" ので作りました。
+      <div class="counter" id="visitCounter">000000</div>
+      <p>あなたはこの美術館に <span id="visitTimes">?</span> 回目のご来館です（あなた調べ）</p>
+      <p style="margin-top: 20px;">"やりたい" ではなく "やると決めた" ので建てました。</p>
     </footer>
 
   </div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== 秋田の空 ===== */
+  var AKITA = { lat: 39.7186, lon: 140.1024 };
+  var WX_LABEL = { sunny: "晴れ", cloudy: "くもり", rain: "雨", storm: "嵐", snow: "雪" };
+
+  function wmoToKind(code) {
+    if (code <= 1) return "sunny";
+    if (code <= 48) return "cloudy";
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return "snow";
+    if (code >= 95) return "storm";
+    return "rain";
+  }
+
+  function fallbackKind() {
+    var m = new Date().getMonth() + 1;
+    if (m === 12 || m <= 2) return "snow";
+    if (m >= 6 && m <= 7) return "rain";
+    return "sunny";
+  }
+
+  function spawnParticles(kind) {
+    var box = document.getElementById("particles");
+    box.innerHTML = "";
+    if (kind !== "rain" && kind !== "storm" && kind !== "snow") return;
+    box.style.cssText = "position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;";
+    var isSnow = kind === "snow";
+    var n = isSnow ? 40 : kind === "storm" ? 90 : 55;
+    for (var i = 0; i < n; i++) {
+      var p = document.createElement("div");
+      p.className = isSnow ? "flake" : "drop";
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.animationDuration = (isSnow ? 6 + Math.random() * 6 : 0.7 + Math.random() * 0.7) + "s";
+      p.style.animationDelay = -Math.random() * 8 + "s";
+      box.appendChild(p);
+    }
+  }
+
+  function setWeather(kind) {
+    document.body.dataset.wx = kind;
+    document.getElementById("wxNote").textContent = "秋田の空：" + WX_LABEL[kind];
+    spawnParticles(kind);
+  }
+
+  var url = "https://api.open-meteo.com/v1/forecast?latitude=" + AKITA.lat +
+            "&longitude=" + AKITA.lon + "&current=weather_code";
+  fetch(url)
+    .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+    .then(function (d) { setWeather(wmoToKind(d.current.weather_code)); })
+    .catch(function () {
+      setWeather(fallbackKind());
+      document.getElementById("wxNote").textContent =
+        "秋田の空：" + WX_LABEL[fallbackKind()] + "（たぶん）";
+    });
+
+  /* ===== ほりくま館長（差し替え可能マスコット） =====
+     新キャラにしたい時は MASCOT の pixels / palette を差し替えるだけ。
+     1文字 = 1ピクセル。"." は透明。 */
+  var MASCOT = {
+    scale: 6,
+    palette: { "#": "#3a2f28", b: "#a9825f", m: "#e3cfae", n: "#3a2f28", k: "#1d1d1d" },
+    pixels: [
+      "..##......##..",
+      ".#bb#....#bb#.",
+      ".#bbb####bbb#.",
+      ".#bbbbbbbbbb#.",
+      "#bbbbbbbbbbbb#",
+      "#b#bbbbbbb#bb#",
+      "#bbbmmmmmmbbb#",
+      "#bbmmnnmmmmbb#",
+      ".#bbmmmmmmbb#.",
+      ".#bbbbbbbbbb#.",
+      "..#bbbbbbbb#..",
+      "..#bb####bb#..",
+      "...##....##..."
+    ]
+  };
+
+  var cv = document.getElementById("mascot");
+  cv.width = MASCOT.pixels[0].length;
+  cv.height = MASCOT.pixels.length;
+  cv.style.width = cv.width * MASCOT.scale + "px";
+  cv.style.height = cv.height * MASCOT.scale + "px";
+  var ctx = cv.getContext("2d");
+  MASCOT.pixels.forEach(function (row, y) {
+    row.split("").forEach(function (ch, x) {
+      if (ch === ".") return;
+      ctx.fillStyle = MASCOT.palette[ch] || "#000";
+      ctx.fillRect(x, y, 1, 1);
+    });
+  });
+
+  /* なでなでミニゲーム */
+  var PET_KEY = "holy-muscle-pets";
+  var pets = parseInt(localStorage.getItem(PET_KEY) || "0", 10);
+  var petLabel = document.getElementById("petCount");
+  function renderPets() {
+    var mood = pets >= 100 ? "（もはや親友）" : pets >= 30 ? "（かなりなついている）" :
+               pets >= 10 ? "（少しなついてきた）" : "";
+    petLabel.textContent = "なでられた回数：" + pets + " " + mood;
+  }
+  renderPets();
+  cv.addEventListener("click", function (e) {
+    pets++;
+    localStorage.setItem(PET_KEY, String(pets));
+    renderPets();
+    var h = document.createElement("span");
+    h.className = "heart";
+    h.textContent = "🤎";
+    h.style.left = e.clientX - 7 + "px";
+    h.style.top = e.clientY - 20 + "px";
+    document.body.appendChild(h);
+    setTimeout(function () { h.remove(); }, 1000);
+  });
+
+  /* ===== レトロ来館カウンター（あなた調べ） ===== */
+  var VISIT_KEY = "holy-muscle-visits";
+  var visits = parseInt(localStorage.getItem(VISIT_KEY) || "0", 10) + 1;
+  localStorage.setItem(VISIT_KEY, String(visits));
+  document.getElementById("visitCounter").textContent = String(visits).padStart(6, "0");
+  document.getElementById("visitTimes").textContent = String(visits);
+})();
+</script>
 
 </body>
 </html>
